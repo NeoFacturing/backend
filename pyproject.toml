@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "karl-ki-backend"
+version = "0.1.0"
+description = ""
+authors = ["Richard <richard.kruemmel@code.berlin>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+fastapi = "^0.94.1"
+pydantic = {extras = ["dotenv"], version = "^1.10.7"}
+uvicorn = "^0.22.0"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+pytest-cov = "^2.10.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
