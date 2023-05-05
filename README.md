@@ -26,7 +26,9 @@ To run this project, you will need to add the following environment variables to
 
 `PROJECT_NAME`
 `OPENAI_API_KEY`
-
+`PINECONE_API_KEY`
+`PINECONE_ENVIRONMENT`
+`PINECONE_INDEX_NAME`
 
 ## Docker
 
