@@ -8,9 +8,9 @@ gpt3 = OpenAI(
     model_name="gpt-3.5-turbo",
 )
 
-template = """Question: {question}
+template = """Frage: {question}
 
-Answer: """
+Antwort: """
 prompt = PromptTemplate(template=template, input_variables=["question"])
 
 llm_chain = LLMChain(prompt=prompt, llm=gpt3)
