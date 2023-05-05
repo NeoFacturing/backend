@@ -22,7 +22,7 @@ Every time
 
 ## Environment Variables
 
-To run this project, you will need to add the following environment variables to your .env file
+To run this project, you will need to add the following environment variables to your .env file:
 
 `PROJECT_NAME`
 
@@ -41,13 +41,13 @@ To run this project, you will need to add the following environment variables to
 
 ### Starting the Container
 
-To stop the running containers, press Ctrl+C in the terminal where the docker-compose up command is running or run the following command:
-
 ```bash
     docker-compose up
 ```
 
 ### Stopping the Container
+
+To stop the running containers, press Ctrl+C in the terminal where the docker-compose up command is running or run the following command:
 
 ```bash
     docker-compose down
