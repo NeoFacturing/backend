@@ -26,6 +26,33 @@ To run this project, you will need to add the following environment variables to
 
 `PROJECT_NAME`
 
+
+## Docker
+
+### Prerequisites
+
+- [Docker](https://docs.docker.com/get-docker/) and Docker Compose installed on your machine.
+
+### Building the Docker Image
+
+```bash
+    docker-compose build
+```
+
+### Starting the Container
+
+To stop the running containers, press Ctrl+C in the terminal where the docker-compose up command is running or run the following command:
+
+```bash
+    docker-compose up
+```
+
+### Stopping the Container
+
+```bash
+    docker-compose down
+```
+
 ## License
 
 This project is licensed under the terms of the MIT license.
