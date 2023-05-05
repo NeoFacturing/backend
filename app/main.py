@@ -1,9 +1,10 @@
 from typing import Optional
-from app.core.chat import get_response
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
+from app.core.chat import get_response
+from app.core.upload_data import upload_data
 
 
 def get_application():
@@ -48,3 +49,9 @@ async def read_chat(
             )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/upload-data")
+async def trigger_data_upload(background_tasks: BackgroundTasks):
+    background_tasks.add_task(upload_data)
+    return {"message": "Data upload triggered"}
