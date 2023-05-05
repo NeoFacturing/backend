@@ -25,6 +25,7 @@ Every time
 To run this project, you will need to add the following environment variables to your .env file:
 
 `PROJECT_NAME`
+`OPENAI_API_KEY`
 
 
 ## Docker
