@@ -1,5 +1,5 @@
-from langchain import ConversationalRetrievalQAChain, LLMChain
-from app.core.ai_model import model
+from langchain.chains import RetrievalQA, LLMChain
+from app.core.ai_model import gpt3
 from typing import Any
 
 CONDENSE_PROMPT = "Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question. Chat History: {chat_history} Follow Up Input: {question} Standalone question:"
@@ -8,13 +8,21 @@ QA_PROMPT = "You are a helpful AI assistant that answers in german. Use the foll
 
 
 def make_chain(vectorstore: Any) -> LLMChain:
-    chain = ConversationalRetrievalQAChain.from_llm(
-        model,
-        vectorstore.as_retriever(),
-        {
-            "qaTemplate": QA_PROMPT,
-            "questionGeneratorTemplate": CONDENSE_PROMPT,
-            "returnSourceDocuments": True,  # The number of source documents returned is 4 by default
-        },
-    )
+    try:
+        retriever = vectorstore.as_retriever()
+    except Exception as e:
+        print(f"Error in converting vectorstore to retriever: {str(e)}")
+        return None
+
+    try:
+        chain = RetrievalQA.from_chain_type(
+            llm=gpt3,
+            chain_type="stuff",
+            retriever=retriever,
+        )
+    except Exception as e:
+        print(f"Error in creating the chain: {str(e)}")
+        return None
+
     return chain
+
