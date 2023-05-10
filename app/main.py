@@ -1,5 +1,5 @@
-from typing import Optional
-from fastapi import FastAPI, HTTPException, Query, BackgroundTasks
+from typing import Optional, Annotated
+from fastapi import FastAPI, HTTPException, Query, BackgroundTasks, Path
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
@@ -35,12 +35,13 @@ async def read_root(name: Optional[str] = "World"):
     description="Get a response from the AI model based on the input text",
 )
 async def read_chat(
-    input: str = Query(
+    question: str = Query(
         ..., description="Input text to get a response from the AI model"
-    )
+    ),
+    history: Annotated[str, Path(title="Chat history")] = "",
 ):
     try:
-        response = get_response(input)
+        response = get_response(question, history)
         if response is not None:
             return {"response": response}
         else:
