@@ -1,8 +1,10 @@
+from app.utils.make_chain import make_chain
+from app.utils.vector_store import make_vectorstore
 from langchain import LLMChain
 from app.core.ai_model import llm_chain
 
 
-def get_response(input: str, llm_chain: LLMChain = llm_chain) -> str:
+def get_response(input: str, history: str, llm_chain: LLMChain = llm_chain) -> str:
     """
     Get a response from the AI model based on the user input.
 
@@ -13,6 +15,30 @@ def get_response(input: str, llm_chain: LLMChain = llm_chain) -> str:
     Returns:
         str: AI model's response
     """
-    response = llm_chain.run(input)
-    print(response)
-    return response
+    try:
+        # OpenAI recommends replacing newlines with spaces for best results
+        sanitizedInput = input.strip()
+    except Exception as e:
+        print(f"Error in sanitizing the input: {str(e)}")
+        return None
+
+    try:
+        vectorstore = make_vectorstore()
+    except Exception as e:
+        print(f"Error in creating the vector store: {str(e)}")
+        return None
+
+    try:
+        chain = make_chain(vectorstore)
+    except Exception as e:
+        print(f"Error in creating the chain: {str(e)}")
+        return None
+
+    try:
+        response = chain.run("Welches Modell ist das?")
+        print(response)
+        return response
+    except Exception as e:
+        print(f"Error in running the chain: {str(e)}")
+        return None
+
