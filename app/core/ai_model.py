@@ -1,11 +1,15 @@
-from langchain import PromptTemplate, LLMChain
-from langchain.llms import OpenAI
+import os
 from dotenv import load_dotenv
+from langchain import PromptTemplate, LLMChain
+from langchain.chat_models import ChatOpenAI
 
 load_dotenv()
 
-gpt3 = OpenAI(
+openai_api_key = os.environ.get("OPENAI_API_KEY")
+gpt3 = ChatOpenAI(
+    openai_api_key=openai_api_key,
     model_name="gpt-3.5-turbo",
+    temperature=0.0,
 )
 
 template = """Frage: {question}
