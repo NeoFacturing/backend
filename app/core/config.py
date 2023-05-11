@@ -1,7 +1,7 @@
 from typing import Any, Dict, List, Optional, Union
 
-from pydantic import AnyHttpUrl, BaseSettings, PostgresDsn, validator
-
+from pydantic import AnyHttpUrl, BaseSettings, validator
+from sqlalchemy.engine.url import URL
 
 class Settings(BaseSettings):
     PROJECT_NAME: str
@@ -16,24 +16,23 @@ class Settings(BaseSettings):
         elif isinstance(v, (list, str)):
             return v
         raise ValueError(v)
-
-    """ POSTGRES_SERVER: str
+        
+    SECRET_KEY: str = "CHANGEME"
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str
+    POSTGRES_SERVER: str = "db"
+    POSTGRES_PORT: str = "5432"
     POSTGRES_DB: str
-    DATABASE_URI: Optional[PostgresDsn] = None """
-
-    """  @validator("DATABASE_URI", pre=True)
-    def assemble_db_connection(cls, v: Optional[str], values: Dict[str, Any]) -> Any:
-        if isinstance(v, str):
-            return v
-        return PostgresDsn.build(
-            scheme="postgresql",
-            user=values.get("POSTGRES_USER"),
-            password=values.get("POSTGRES_PASSWORD"),
-            host=values.get("POSTGRES_SERVER"),
-            path=f"/{values.get('POSTGRES_DB') or ''}",
-        ) """
+    
+    def DATABASE_URL(self):
+        return str(URL.create(
+            drivername="postgresql",
+            username=self.POSTGRES_USER,
+            password=self.POSTGRES_PASSWORD,
+            host=self.POSTGRES_SERVER,
+            port=self.POSTGRES_PORT,
+            database=self.POSTGRES_DB
+        ))
 
     class Config:
         case_sensitive = True
