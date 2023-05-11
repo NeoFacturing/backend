@@ -4,7 +4,7 @@ from langchain import LLMChain
 from app.core.ai_model import llm_chain
 
 
-def get_response(input: str, history: str, llm_chain: LLMChain = llm_chain) -> str:
+def get_response(input: str, history: str) -> str:
     """
     Get a response from the AI model based on the user input.
 
@@ -17,7 +17,7 @@ def get_response(input: str, history: str, llm_chain: LLMChain = llm_chain) -> s
     """
     try:
         # OpenAI recommends replacing newlines with spaces for best results
-        sanitizedInput = input.strip()
+        sanitizedInput = input.strip().replace("\n", " ")
     except Exception as e:
         print(f"Error in sanitizing the input: {str(e)}")
         return None
@@ -35,10 +35,12 @@ def get_response(input: str, history: str, llm_chain: LLMChain = llm_chain) -> s
         return None
 
     try:
-        response = chain.run("Welches Modell ist das?")
+        response = chain({"question": sanitizedInput, "chat_history": history})
+        answer = response["answer"].strip().replace("\n", " ")
+        source = response["sources"]
         print(response)
-        return response
+        return {"answer": answer, "source": source}
+
     except Exception as e:
         print(f"Error in running the chain: {str(e)}")
         return None
-
