@@ -1,8 +1,10 @@
-from typing import Optional
-from fastapi import FastAPI
+from typing import Optional, Annotated
+from fastapi import FastAPI, HTTPException, Query, BackgroundTasks, Path
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
+from app.core.chat import get_response
+from app.core.upload_data import upload_data
 
 
 def get_application():
@@ -21,6 +23,36 @@ def get_application():
 
 app = get_application()
 
+
 @app.get("/")
-def read_root(name: Optional[str] = "World"):
+async def read_root(name: Optional[str] = "World"):
     return {"Hello": name}
+
+
+@app.get(
+    "/chat",
+    summary="Chat with the AI",
+    description="Get a response from the AI model based on the input text",
+)
+async def read_chat(
+    question: str = Query(
+        ..., description="Input text to get a response from the AI model"
+    ),
+    history: Annotated[str, Path(title="Chat history")] = "",
+):
+    try:
+        response = get_response(question, history)
+        if response is not None:
+            return {"response": response}
+        else:
+            raise HTTPException(
+                status_code=500, detail="Failed to get a response from the AI model"
+            )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/upload-data")
+async def trigger_data_upload(background_tasks: BackgroundTasks):
+    background_tasks.add_task(upload_data)
+    return {"message": "Data upload triggered"}
