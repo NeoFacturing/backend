@@ -20,6 +20,7 @@ sqlalchemy = "^2.0.13"
 alembic = "^1.10.4"
 psycopg2 = "^2.9.6"
 passlib = "^1.7.4"
+python-multipart = "^0.0.6"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
