@@ -10,7 +10,6 @@ def make_chain(vectorstore: Any) -> LLMChain:
     except Exception as e:
         print(f"Error in converting vectorstore to retriever: {str(e)}")
         return None
-
     try:
         chain = RetrievalQAWithSourcesChain.from_chain_type(
             llm=OpenAI(),
