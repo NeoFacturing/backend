@@ -1,7 +1,6 @@
+from app.core.agent import agent
 from app.utils.make_chain import make_chain
-from app.utils.vector_store import make_vectorstore
-from langchain import LLMChain
-from app.core.ai_model import llm_chain
+#from app.utils.vector_store import make_vectorstore
 
 
 def get_response(input: str, history: str) -> str:
@@ -22,7 +21,7 @@ def get_response(input: str, history: str) -> str:
         print(f"Error in sanitizing the input: {str(e)}")
         return None
 
-    try:
+    """ try:
         vectorstore = make_vectorstore()
     except Exception as e:
         print(f"Error in creating the vector store: {str(e)}")
@@ -32,14 +31,15 @@ def get_response(input: str, history: str) -> str:
         chain = make_chain(vectorstore)
     except Exception as e:
         print(f"Error in creating the chain: {str(e)}")
-        return None
+        return None """
 
     try:
-        response = chain({"question": sanitizedInput, "chat_history": history})
-        answer = response["answer"].strip().replace("\n", " ")
-        source = response["sources"]
-        print(response)
-        return {"answer": answer, "source": source}
+        agent_response = agent.run(input=sanitizedInput)
+        #response = chain({"question": sanitizedInput, "chat_history": history})
+        #answer = response["answer"].strip().replace("\n", " ")
+        #source = response["sources"]
+        return agent_response
+        #return {"answer": answer, "source": source}
 
     except Exception as e:
         print(f"Error in running the chain: {str(e)}")
