@@ -17,7 +17,7 @@ from jose import jwt, JWTError
 from fastapi.security import OAuth2PasswordRequestForm
 from datetime import timedelta
 
-from app.core.config import settings
+from app.database.config import settings
 from app.core.chat import get_response
 from app.core.upload_data import upload_data
 from app.core.whisper import speech_to_text
