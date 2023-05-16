@@ -1,57 +1,24 @@
-from langchain.agents import Tool, initialize_agent
+from langchain.agents import AgentExecutor, ConversationalChatAgent, ZeroShotAgent
 import langchain.chains.conversation as conversational_memory
-from langchain.chains.conversation.memory import ConversationBufferWindowMemory
-from langchain.chains import RetrievalQA, LLMChain
-from langchain.llms import OpenAI
+from langchain import LLMChain
 
-from app.core.ai_model import chatgpt
-from app.core.prompt import prompt_template
-from app.utils.vector_store import make_retriever
+# from app.core.prompt import prompt
+from app.core.llm import chatgpt
+from app.core.memory import conversational_memory
+from app.core.tools import tools
+from app.core.prompt import zero_shot_prompt
 
+# LLM chain needs to be instantiated with the LLM model and the right prompt for the agent
+llm_chain = LLMChain(llm=chatgpt, prompt=zero_shot_prompt)
+zero_shot_agent = ZeroShotAgent(llm_chain=llm_chain, tools=tools, verbose=True)
 
-
-retriever = make_retriever()
-
-#llm_chain = LLMChain(llm=chatgpt, prompt=chat_prompt)
-
-qa_chain = RetrievalQA.from_chain_type(
-            llm=chatgpt,
-            chain_type="stuff",
-            retriever=retriever,
-        )
-
-conversational_memory = ConversationBufferWindowMemory(
-    memory_key='chat_history',
-    k=5,
-    return_messages=True
-)
-
-tools = [
-    Tool(
-        name='Knowledge Base',
-        func=qa_chain.run,
-        description=(
-            'Benutze die Knowledge Base um Antworten auf Fragen zu finden.'
-        )
-    )
-]
-
-prompt_with_history = CustomPromptTemplate(
-    template=template,
+# Agent below is not working
+conversational_chat_agent = ConversationalChatAgent(
     tools=tools,
-    # This omits the `agent_scratchpad`, `tools`, and `tool_names` variables because those are generated dynamically
-    # This includes the `intermediate_steps` variable because that is needed
-    input_variables=["input", "intermediate_steps", "history"]
-)
-
-agent = initialize_agent(
-    agent='chat-conversational-react-description',
-    tools=tools,
-    llm=chatgpt,
+    llm_chain=llm_chain,
     verbose=True,
-    max_iterations=3,
-    early_stopping_method='generate',
-    memory=conversational_memory
 )
 
-print(agent.agent.llm_chain.prompt)
+agent_chain = AgentExecutor.from_agent_and_tools(
+    agent=zero_shot_agent, tools=tools, verbose=True, memory=conversational_memory
+)
