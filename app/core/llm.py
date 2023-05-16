@@ -11,8 +11,3 @@ chatgpt = ChatOpenAI(
     model_name="gpt-3.5-turbo",
     temperature=0.0,
 )
-
-template = """Frage: {question}
-
-Antwort: """
-prompt = PromptTemplate(template=template, input_variables=["question"])
