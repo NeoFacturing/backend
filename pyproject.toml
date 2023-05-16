@@ -21,6 +21,7 @@ psycopg2 = "^2.9.6"
 passlib = "^1.7.4"
 python-multipart = "^0.0.6"
 authlib = "^1.2.0"
+pg8000 = "^1.29.5"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
