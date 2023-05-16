@@ -1,6 +1,7 @@
-from app.core.agent import agent
+from app.core.agent import agent_chain
 from app.utils.make_chain import make_chain
-#from app.utils.vector_store import make_vectorstore
+
+# from app.utils.vector_store import make_vectorstore
 
 
 def get_response(input: str, history: str) -> str:
@@ -34,12 +35,12 @@ def get_response(input: str, history: str) -> str:
         return None """
 
     try:
-        agent_response = agent.run(input=sanitizedInput)
-        #response = chain({"question": sanitizedInput, "chat_history": history})
-        #answer = response["answer"].strip().replace("\n", " ")
-        #source = response["sources"]
+        agent_response = agent_chain.run(input=sanitizedInput)
+        # response = chain({"question": sanitizedInput, "chat_history": history})
+        # answer = response["answer"].strip().replace("\n", " ")
+        # source = response["sources"]
         return agent_response
-        #return {"answer": answer, "source": source}
+        # return {"answer": answer, "source": source}
 
     except Exception as e:
         print(f"Error in running the chain: {str(e)}")
