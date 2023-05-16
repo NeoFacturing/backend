@@ -1,6 +1,5 @@
 from langchain.chains import RetrievalQAWithSourcesChain, LLMChain
 from langchain.llms import OpenAI
-from app.core.ai_model import chatgpt
 from typing import Any
 
 
