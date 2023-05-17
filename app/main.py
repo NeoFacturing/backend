@@ -9,7 +9,16 @@ from fastapi import (
 )
 import os
 from pydantic import BaseModel
-from fastapi import FastAPI, Depends, HTTPException, Query, BackgroundTasks, Path, status, Response
+from fastapi import (
+    FastAPI,
+    Depends,
+    HTTPException,
+    Query,
+    BackgroundTasks,
+    Path,
+    status,
+    Response,
+)
 from fastapi.middleware.cors import CORSMiddleware
 
 import requests
@@ -44,7 +53,9 @@ def get_application():
 
     return _app
 
+
 app = get_application()
+
 
 def get_db():
     db = Session()
@@ -52,6 +63,7 @@ def get_db():
         yield db
     finally:
         db.close()
+
 
 def authenticate_user(username: str, password: str, db: Session):
     print(username)
@@ -112,9 +124,11 @@ def get_current_user_from_token(
         raise credentials_exception
     return user
 
+
 @app.get("/")
 async def read_root(name: Optional[str] = "World"):
     return {"Hello": name}
+
 
 @app.get("/users/me")
 async def read_users_me(current_user: User = Depends(get_current_user_from_token)):
@@ -129,11 +143,32 @@ async def read_users_me(current_user: User = Depends(get_current_user_from_token
 async def read_chat(
     question: str = Query(
         ..., description="Input text to get a response from the AI model"
-    ),
-    history: Annotated[str, Path(title="Chat history")] = "",
+    )
 ):
     try:
-        response = get_response(question, history)
+        response = get_response(question, ai="qa-chain")
+        if response is not None:
+            return {"response": response}
+        else:
+            raise HTTPException(
+                status_code=500, detail="Failed to get a response from the AI model"
+            )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get(
+    "/chat-agent",
+    summary="Chat with the AI-Agent",
+    description="Get a response from the AI model based on the input text",
+)
+async def read_chat(
+    question: str = Query(
+        ..., description="Input text to get a response from the AI model"
+    )
+):
+    try:
+        response = get_response(question, ai="agent")
         if response is not None:
             return {"response": response}
         else:
