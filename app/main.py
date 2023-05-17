@@ -19,7 +19,7 @@ from datetime import timedelta
 
 from app.database.config import settings
 from app.core.chat import get_response
-from app.core.upload_data import upload_data
+from app.utils.upload_data import upload_data
 from app.core.whisper import speech_to_text
 from app.utils.upload_data import upload_data
 from app.database.database import Session
