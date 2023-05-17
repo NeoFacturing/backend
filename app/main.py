@@ -1,10 +1,18 @@
-from typing import Optional, Annotated
-from fastapi import FastAPI, HTTPException, Query, BackgroundTasks, Path
+from typing import List, Optional, Annotated
+from fastapi import (
+    FastAPI,
+    HTTPException,
+    Query,
+    BackgroundTasks,
+    Path,
+    UploadFile,
+)
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 from app.core.chat import get_response
 from app.core.upload_data import upload_data
+from app.core.whisper import speech_to_text
 
 
 def get_application():
@@ -12,6 +20,7 @@ def get_application():
 
     _app.add_middleware(
         CORSMiddleware,
+        # allow_origins=["*"],
         allow_origins=[str(origin) for origin in settings.BACKEND_CORS_ORIGINS],
         allow_credentials=True,
         allow_methods=["*"],
@@ -56,3 +65,9 @@ async def read_chat(
 async def trigger_data_upload(background_tasks: BackgroundTasks):
     background_tasks.add_task(upload_data)
     return {"message": "Data upload triggered"}
+
+
+@app.post("/whisper")
+async def create_upload_file(file: UploadFile):
+    result = speech_to_text(file.file)
+    return {"result": result}
