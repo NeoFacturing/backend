@@ -6,7 +6,7 @@ authors = ["Richard <richard.kruemmel@code.berlin>"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-fastapi = "^0.94.1"
+fastapi = "^0.100"
 pydantic = {extras = ["dotenv"], version = "^1.10.7"}
 uvicorn = "^0.22.0"
 langchain = "^0.0.158"
