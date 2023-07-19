@@ -8,6 +8,7 @@ __pycache__/
 
 # pdfs
 *.pdf
+*.STEP
 
 # Distribution / packaging
 .Python
