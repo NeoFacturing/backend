@@ -1,41 +1,31 @@
-from typing import List, Optional, Annotated
-from fastapi import (
-    FastAPI,
-    HTTPException,
-    Query,
-    BackgroundTasks,
-    Path,
-    UploadFile
-)
+from datetime import timedelta
 import os
-from pydantic import BaseModel
+from typing import List, Optional, Annotated
+
 from fastapi import (
     FastAPI,
     Depends,
     HTTPException,
     Query,
-    BackgroundTasks,
-    Path,
     status,
     Response,
+    UploadFile
 )
 from fastapi.middleware.cors import CORSMiddleware
-
-import requests
-from jose import jwt, JWTError
 from fastapi.security import OAuth2PasswordRequestForm
-from datetime import timedelta
+from jose import jwt, JWTError
+from pydantic import BaseModel
 
-from app.database.config import settings
 from app.core.chat import get_response
-from app.utils.upload_file import upload_file
 from app.core.whisper import speech_to_text
+from app.database.config import settings
 from app.database.database import Session
 from app.database.get_user import get_user
-from app.utils.hashing import Hasher
 from app.database.schemas import Token, User
-from app.utils.bearer import OAuth2PasswordBearerWithCookie
 from app.security import create_access_token
+from app.utils.bearer import OAuth2PasswordBearerWithCookie
+from app.utils.hashing import Hasher
+from app.utils.upload_file import upload_file
 
 
 def get_application():
