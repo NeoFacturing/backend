@@ -5,7 +5,7 @@ from fastapi import (
     Query,
     BackgroundTasks,
     Path,
-    UploadFile,
+    UploadFile
 )
 import os
 from pydantic import BaseModel
@@ -28,9 +28,8 @@ from datetime import timedelta
 
 from app.database.config import settings
 from app.core.chat import get_response
-from app.utils.upload_data import upload_data
+from app.utils.upload_file import upload_file
 from app.core.whisper import speech_to_text
-from app.utils.upload_data import upload_data
 from app.database.database import Session
 from app.database.get_user import get_user
 from app.utils.hashing import Hasher
@@ -179,11 +178,10 @@ async def read_chat(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.post("/upload-data")
-async def trigger_data_upload(background_tasks: BackgroundTasks):
-    background_tasks.add_task(upload_data)
-    return {"message": "Data upload triggered"}
-
+@app.post("/upload-file")
+async def create_upload_file( file: UploadFile):
+    result = await upload_file(file)
+    return {"result": result}
 
 @app.post("/whisper")
 async def create_upload_file(file: UploadFile):
