@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "karl-ki-backend"
+name = "neoFacturing-backend"
 version = "0.1.0"
 description = ""
 authors = ["Richard <richard.kruemmel@code.berlin>"]
