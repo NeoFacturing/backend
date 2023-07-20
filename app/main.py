@@ -2,15 +2,7 @@ from datetime import timedelta
 import os
 from typing import List, Optional, Annotated
 
-from fastapi import (
-    FastAPI,
-    Depends,
-    HTTPException,
-    Query,
-    status,
-    Response,
-    UploadFile
-)
+from fastapi import FastAPI, Depends, HTTPException, Query, status, Response, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm
 from jose import jwt, JWTError
@@ -115,7 +107,7 @@ def get_current_user_from_token(
 
 
 @app.get("/")
-async def read_root(name: Optional[str] = "World"):
+async def read_root(name: Optional[str] = "we are neoFacturing"):
     return {"Hello": name}
 
 
@@ -135,29 +127,7 @@ async def read_chat(
     )
 ):
     try:
-        response = get_response(question, ai="qa-chain")
-        if response is not None:
-            return {"response": response}
-        else:
-            raise HTTPException(
-                status_code=500, detail="Failed to get a response from the AI model"
-            )
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@app.get(
-    "/chat-agent",
-    summary="Chat with the AI-Agent",
-    description="Get a response from the AI model based on the input text",
-)
-async def read_chat(
-    question: str = Query(
-        ..., description="Input text to get a response from the AI model"
-    )
-):
-    try:
-        response = get_response(question, ai="agent")
+        response = get_response(question, ai="llm")
         if response is not None:
             return {"response": response}
         else:
@@ -169,11 +139,6 @@ async def read_chat(
 
 
 @app.post("/upload-file")
-async def create_upload_file( file: UploadFile):
-    result = await upload_file(file)
-    return {"result": result}
-
-@app.post("/whisper")
 async def create_upload_file(file: UploadFile):
-    result = speech_to_text(file.file)
+    result = await upload_file(file)
     return {"result": result}
