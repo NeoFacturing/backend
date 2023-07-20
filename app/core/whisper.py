@@ -2,6 +2,7 @@ import os
 import openai
 import tempfile
 
+
 def speech_to_text(audio_file):
     openai.api_key = os.getenv("OPENAI_API_KEY")
 
