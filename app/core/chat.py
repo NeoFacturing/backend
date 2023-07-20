@@ -1,5 +1,4 @@
-from app.core.agent import agent_chain
-from app.core.llm_chain import qa_chain
+from app.core.llm_chain import simple_llm_chain
 
 
 def get_response(input: str, ai: str) -> str:
@@ -20,13 +19,8 @@ def get_response(input: str, ai: str) -> str:
         print(f"Error in sanitizing the input: {str(e)}")
         return None
     try:
-        if ai == "agent":
-            agent_response = agent_chain.run(input=sanitizedInput)
-            return agent_response
-        else:
-            response = qa_chain.run(sanitizedInput)
-            return response
-
+        response = simple_llm_chain.run(input=sanitizedInput)
+        return response
     except Exception as e:
         print(f"Error in running the chain: {str(e)}")
         return None

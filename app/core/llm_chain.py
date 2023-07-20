@@ -1,11 +1,8 @@
+from langchain import LLMChain
 from langchain.chains import RetrievalQA
+
 from app.utils.vector_store import make_retriever
 from app.core.llm import chatgpt
+from app.core.prompt import simple_prompt_template
 
-retriever = make_retriever()
-
-qa_chain = RetrievalQA.from_chain_type(
-    llm=chatgpt,
-    chain_type="stuff",
-    retriever=retriever,
-)
+simple_llm_chain = LLMChain(llm=chatgpt, prompt=simple_prompt_template)
