@@ -1,0 +1,29 @@
+on:
+  push:
+    branches: [main, development]
+  pull_request:
+    branches: [main, development]
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - name: Install Poetry
+        run: curl -sSL https://install.python-poetry.org | python -
+      - run: poetry install
+
+      - name: Lint
+        run: poetry run python -m black --check .
+
+      - name: Tests
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          ALGORITHM: ${{ secrets.ALGORITHM }}
+          ACCESS_TOKEN_EXPIRE_MINUTES: ${{ secrets.ACCESS_TOKEN_EXPIRE_MINUTES }}
+        run: poetry run pytest

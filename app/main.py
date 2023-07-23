@@ -1,42 +1,23 @@
-from typing import List, Optional, Annotated
-from fastapi import (
-    FastAPI,
-    HTTPException,
-    Query,
-    BackgroundTasks,
-    Path,
-    UploadFile,
-)
-import os
-from pydantic import BaseModel
-from fastapi import (
-    FastAPI,
-    Depends,
-    HTTPException,
-    Query,
-    BackgroundTasks,
-    Path,
-    status,
-    Response,
-)
-from fastapi.middleware.cors import CORSMiddleware
-
-import requests
-from jose import jwt, JWTError
-from fastapi.security import OAuth2PasswordRequestForm
 from datetime import timedelta
+import os
+from typing import List, Optional, Annotated
 
-from app.database.config import settings
+from fastapi import FastAPI, Depends, HTTPException, Query, status, Response, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import OAuth2PasswordRequestForm
+from jose import jwt, JWTError
+from pydantic import BaseModel
+
 from app.core.chat import get_response
-from app.utils.upload_data import upload_data
 from app.core.whisper import speech_to_text
-from app.utils.upload_data import upload_data
+from app.database.config import settings
 from app.database.database import Session
 from app.database.get_user import get_user
-from app.utils.hashing import Hasher
 from app.database.schemas import Token, User
-from app.utils.bearer import OAuth2PasswordBearerWithCookie
 from app.security import create_access_token
+from app.utils.bearer import OAuth2PasswordBearerWithCookie
+from app.utils.hashing import Hasher
+from app.utils.upload_file import upload_file
 
 
 def get_application():
@@ -126,7 +107,7 @@ def get_current_user_from_token(
 
 
 @app.get("/")
-async def read_root(name: Optional[str] = "World"):
+async def read_root(name: Optional[str] = "we are neoFacturing"):
     return {"Hello": name}
 
 
@@ -146,7 +127,7 @@ async def read_chat(
     )
 ):
     try:
-        response = get_response(question, ai="qa-chain")
+        response = get_response(question, ai="llm")
         if response is not None:
             return {"response": response}
         else:
@@ -157,35 +138,7 @@ async def read_chat(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get(
-    "/chat-agent",
-    summary="Chat with the AI-Agent",
-    description="Get a response from the AI model based on the input text",
-)
-async def read_chat(
-    question: str = Query(
-        ..., description="Input text to get a response from the AI model"
-    )
-):
-    try:
-        response = get_response(question, ai="agent")
-        if response is not None:
-            return {"response": response}
-        else:
-            raise HTTPException(
-                status_code=500, detail="Failed to get a response from the AI model"
-            )
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@app.post("/upload-data")
-async def trigger_data_upload(background_tasks: BackgroundTasks):
-    background_tasks.add_task(upload_data)
-    return {"message": "Data upload triggered"}
-
-
-@app.post("/whisper")
+@app.post("/upload-file")
 async def create_upload_file(file: UploadFile):
-    result = speech_to_text(file.file)
+    result = await upload_file(file)
     return {"result": result}

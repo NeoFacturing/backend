@@ -3,8 +3,9 @@ from typing import Any, Dict, List, Optional, Union
 from pydantic import AnyHttpUrl, BaseSettings, validator
 from sqlalchemy.engine.url import URL
 
+
 class Settings(BaseSettings):
-    PROJECT_NAME: str
+    PROJECT_NAME: str = "NeoFacturing-Backend"
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = []
 
     @validator("BACKEND_CORS_ORIGINS", pre=True)
@@ -14,23 +15,25 @@ class Settings(BaseSettings):
         elif isinstance(v, (list, str)):
             return v
         raise ValueError(v)
-        
-    SECRET_KEY: str = "CHANGEME"
-    POSTGRES_USER: str
-    POSTGRES_PASSWORD: str
+
+    # Dummy Data for Postgres
+    POSTGRES_USER: str = "postgres"
+    POSTGRES_PASSWORD: str = "postgres"
     POSTGRES_SERVER: str = "db"
     POSTGRES_PORT: str = "5432"
-    POSTGRES_DB: str
-    
+    POSTGRES_DB: str = "postgres"
+
     def DATABASE_URL(self):
-        return str(URL.create(
-            drivername="postgresql",
-            username=self.POSTGRES_USER,
-            password=self.POSTGRES_PASSWORD,
-            host=self.POSTGRES_SERVER,
-            port=self.POSTGRES_PORT,
-            database=self.POSTGRES_DB
-        ))
+        return str(
+            URL.create(
+                drivername="postgresql",
+                username=self.POSTGRES_USER,
+                password=self.POSTGRES_PASSWORD,
+                host=self.POSTGRES_SERVER,
+                port=self.POSTGRES_PORT,
+                database=self.POSTGRES_DB,
+            )
+        )
 
     class Config:
         case_sensitive = True
