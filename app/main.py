@@ -1,3 +1,18 @@
+from typing import List, Optional
+import os
+from fastapi import (
+    FastAPI,
+    Depends,
+    File,
+    HTTPException,
+    status,
+    Response,
+)
+from fastapi.middleware.cors import CORSMiddleware
+from azure.storage.blob import BlobServiceClient
+
+from jose import jwt, JWTError
+from fastapi.security import OAuth2PasswordRequestForm
 from datetime import timedelta
 import os
 from typing import List, Optional, Annotated
@@ -9,15 +24,13 @@ from jose import jwt, JWTError
 from pydantic import BaseModel
 
 from app.core.chat import get_response
-from app.core.whisper import speech_to_text
 from app.database.config import settings
 from app.database.database import Session
 from app.database.get_user import get_user
-from app.database.schemas import Token, User
+from app.database.schemas import ChatRequest, Token, User
 from app.security import create_access_token
 from app.utils.bearer import OAuth2PasswordBearerWithCookie
 from app.utils.hashing import Hasher
-from app.utils.upload_file import upload_file
 
 
 def get_application():
@@ -116,18 +129,14 @@ async def read_users_me(current_user: User = Depends(get_current_user_from_token
     return current_user
 
 
-@app.get(
+@app.post(
     "/chat",
     summary="Chat with the AI",
     description="Get a response from the AI model based on the input text",
 )
-async def read_chat(
-    question: str = Query(
-        ..., description="Input text to get a response from the AI model"
-    )
-):
+async def read_chat(request: ChatRequest):
     try:
-        response = get_response(question, ai="llm")
+        response = get_response(request.messages[-1].content, ai="qa-chain")
         if response is not None:
             return {"response": response}
         else:
@@ -138,7 +147,22 @@ async def read_chat(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.post("/upload-file")
-async def create_upload_file(file: UploadFile):
-    result = await upload_file(file)
-    return {"result": result}
+@app.post("/uploadfile")
+async def create_upload_file(
+    # current_user: User = Depends(get_current_user_from_token),
+    file: UploadFile = File(...),
+):
+    try:
+        blob_service_client = BlobServiceClient.from_connection_string(
+            os.getenv("AZURE_STORAGE_CONNECTION_STRING")
+        )
+        blob_client = blob_service_client.get_blob_client("uploads", file.filename)
+
+        data = await file.read()
+        blob_client.upload_blob(data, overwrite=True)
+        print(f"File {file.filename} uploaded successfully")
+        return {"filename": file.filename}
+    except Exception as e:
+        print("Error uploading file")
+        print(e)
+        raise HTTPException(status_code=500, detail="Failed to upload file")

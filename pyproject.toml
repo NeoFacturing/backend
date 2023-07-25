@@ -22,6 +22,7 @@ psycopg2 = "^2.9.6"
 passlib = "^1.7.4"
 authlib = "^1.2.0"
 pg8000 = "^1.29.5"
+azure-storage-blob = "^12.17.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.5"

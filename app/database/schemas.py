@@ -1,5 +1,4 @@
 from pydantic import BaseModel
-from typing import Optional
 
 
 class UserBase(BaseModel):
@@ -22,3 +21,13 @@ class User(UserBase):
 class Token(BaseModel):
     access_token: str
     token_type: str
+
+
+class Message(BaseModel):
+    role: str
+    content: str
+
+
+class ChatRequest(BaseModel):
+    messages: list[Message]
+    files: list[str] = []
