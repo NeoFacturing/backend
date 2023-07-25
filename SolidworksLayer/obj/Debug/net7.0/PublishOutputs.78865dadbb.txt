@@ -1,0 +1,3 @@
+C:\Users\RichardKrümmel\backend\SolidworksLayer\bin\Debug\net7.0\publish\SolidworksLayer.dll
+C:\Users\RichardKrümmel\backend\SolidworksLayer\bin\Debug\net7.0\publish\SolidworksLayer.deps.json
+C:\Users\RichardKrümmel\backend\SolidworksLayer\bin\Debug\net7.0\publish\SolidworksLayer.pdb

@@ -5,7 +5,7 @@ description = ""
 authors = ["Richard <richard.kruemmel@code.berlin>"]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = ">=3.9,<3.12"
 fastapi = "^0.100"
 pydantic = {extras = ["dotenv"], version = "^1.10.7"}
 uvicorn = "^0.22.0"
@@ -22,6 +22,8 @@ psycopg2 = "^2.9.6"
 passlib = "^1.7.4"
 authlib = "^1.2.0"
 pg8000 = "^1.29.5"
+azure-storage-blob = "^12.17.0"
+pythonnet = "^3.0.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.5"

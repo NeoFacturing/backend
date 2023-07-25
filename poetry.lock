@@ -472,6 +472,20 @@ files = [
 colorama = {version = "*", markers = "platform_system == \"Windows\""}
 
 [[package]]
+name = "clr-loader"
+version = "0.2.5"
+description = "Generic pure Python loader for .NET runtimes"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "clr_loader-0.2.5-py3-none-any.whl", hash = "sha256:9951413acfe56a82e8cb49413f3703ed88e7f7afc4447c6e993d6b34a2b3249c"},
+    {file = "clr_loader-0.2.5.tar.gz", hash = "sha256:82ed5fb654729d14fd88296e74bb6b84eb2cfb976ff4b7d49d4e449fd78a226b"},
+]
+
+[package.dependencies]
+cffi = ">=1.13"
+
+[[package]]
 name = "colorama"
 version = "0.4.6"
 description = "Cross-platform colored terminal text."
@@ -1780,6 +1794,20 @@ files = [
 dev = ["atomicwrites (==1.2.1)", "attrs (==19.2.0)", "coverage (==6.5.0)", "hatch", "invoke (==1.7.3)", "more-itertools (==4.3.0)", "pbr (==4.3.0)", "pluggy (==1.0.0)", "py (==1.11.0)", "pytest (==7.2.0)", "pytest-cov (==4.0.0)", "pytest-timeout (==2.1.0)", "pyyaml (==5.1)"]
 
 [[package]]
+name = "pythonnet"
+version = "3.0.1"
+description = ".NET and Mono integration for Python"
+optional = false
+python-versions = "<3.12,>=3.7"
+files = [
+    {file = "pythonnet-3.0.1-py3-none-any.whl", hash = "sha256:46882dabb3532b8353f42815b21176545e1a34a5e4730b3cb04a8e430ae9f9ec"},
+    {file = "pythonnet-3.0.1.tar.gz", hash = "sha256:ed4f7f7f95515404112ddb3da1638e1a1013cb56e64c48c4fa60303f02b0a3dd"},
+]
+
+[package.dependencies]
+clr-loader = ">=0.2.2,<0.3.0"
+
+[[package]]
 name = "pyyaml"
 version = "6.0.1"
 description = "YAML parser and emitter for Python"
@@ -2393,5 +2421,10 @@ multidict = ">=4.0"
 
 [metadata]
 lock-version = "2.0"
+<<<<<<< Updated upstream
 python-versions = "^3.9"
 content-hash = "f815a50c063c50fde0f1bc3be713dc912af4a9e9e96f1c45f46eff8a19214e45"
+=======
+python-versions = ">=3.9,<3.12"
+content-hash = "6ad9b994798d0444325c4ac0b3565f919156869eebe85ba1ffc60e24912d14de"
+>>>>>>> Stashed changes
