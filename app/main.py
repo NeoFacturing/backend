@@ -1,29 +1,16 @@
 from typing import List, Optional
-from fastapi import (
-    FastAPI,
-    HTTPException,
-    Query,
-    BackgroundTasks,
-    UploadFile,
-    File,
-)
 import os
-from pydantic import BaseModel
 from fastapi import (
     FastAPI,
     Depends,
+    File,
     HTTPException,
-    Query,
-    BackgroundTasks,
-    Path,
     status,
     Response,
 )
 from fastapi.middleware.cors import CORSMiddleware
 from azure.storage.blob import BlobServiceClient
 
-
-import requests
 from jose import jwt, JWTError
 from fastapi.security import OAuth2PasswordRequestForm
 from datetime import timedelta
@@ -37,15 +24,13 @@ from jose import jwt, JWTError
 from pydantic import BaseModel
 
 from app.core.chat import get_response
-from app.core.whisper import speech_to_text
 from app.database.config import settings
 from app.database.database import Session
 from app.database.get_user import get_user
-from app.database.schemas import Token, User
+from app.database.schemas import ChatRequest, Token, User
 from app.security import create_access_token
 from app.utils.bearer import OAuth2PasswordBearerWithCookie
 from app.utils.hashing import Hasher
-from app.utils.upload_file import upload_file
 
 
 def get_application():
@@ -144,16 +129,6 @@ async def read_users_me(current_user: User = Depends(get_current_user_from_token
     return current_user
 
 
-class Message(BaseModel):
-    role: str
-    content: str
-
-
-class ChatRequest(BaseModel):
-    messages: List[Message]
-    files: list[str] = []
-
-
 @app.post(
     "/chat",
     summary="Chat with the AI",
@@ -170,18 +145,6 @@ async def read_chat(request: ChatRequest):
             )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
-
-@app.post("/upload-data")
-async def trigger_data_upload(background_tasks: BackgroundTasks):
-    background_tasks.add_task(upload_data)
-    return {"message": "Data upload triggered"}
-
-
-@app.post("/whisper")
-async def create_upload_file(file: UploadFile):
-    result = await upload_file(file)
-    return {"result": result}
 
 
 @app.post("/uploadfile")
