@@ -30,6 +30,8 @@ jobs:
           DECODING_ALGORITHM: ${{ secrets.DECODING_ALGORITHM }}
           ACCESS_TOKEN_EXPIRE_MINUTES: ${{ secrets.ACCESS_TOKEN_EXPIRE_MINUTES }}
           AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
+          OPENAI_API_BASE: ${{ secrets.OPENAI_API_BASE }}
+          OPENAI_API_VERSION: ${{ secrets.OPENAI_API_VERSION }}
         run: poetry run pytest
 
   cd:
