@@ -120,7 +120,7 @@ def get_current_user_from_token(
 
 
 @app.get("/")
-async def read_root(name: Optional[str] = "we are neoFacturing"):
+async def read_root(name: Optional[str] = "we are neoFacturing!"):
     return {"Hello": name}
 
 
@@ -138,7 +138,7 @@ async def read_chat(request: ChatRequest):
     try:
         response = get_response(request.messages[-1].content, ai="qa-chain")
         if response is not None:
-            return {"response": response}
+            return response
         else:
             raise HTTPException(
                 status_code=500, detail="Failed to get a response from the AI model"

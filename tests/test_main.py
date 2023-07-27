@@ -1,8 +1,12 @@
 import pytest
 from fastapi.testclient import TestClient
-from app.main import app  # replace with the actual path to your FastAPI app
-import tempfile
+from app.main import app, read_chat
+import asyncio
 import os
+import tempfile
+from unittest.mock import patch, MagicMock
+from fastapi import HTTPException
+from app.database.schemas import ChatRequest, Message
 
 
 @pytest.fixture(scope="module")
@@ -40,3 +44,25 @@ def test_upload_file(test_client, test_file):
     # Cleanup: remove the uploaded file
     if os.path.exists("docs/test.step"):
         os.remove("docs/test.step")
+
+
+def test_read_chat():
+    # create a mock request
+    mock_request = ChatRequest(
+        messages=[Message(role="user", content="Hello, AI!")], files=["test.step"]
+    )
+    # Mock the get_response function to return a response
+    with patch(
+        "app.main.get_response", return_value="Hello, user!"
+    ) as mock_get_response:
+        response = asyncio.run(read_chat(mock_request))
+        assert response == "Hello, user!"
+        mock_get_response.assert_called_once_with("Hello, AI!", ai="qa-chain")
+
+    # Mock the get_response function to raise an Exception
+    with patch("app.main.get_response", side_effect=Exception()) as mock_get_response:
+        with pytest.raises(HTTPException) as excinfo:
+            asyncio.run(read_chat(mock_request))
+        assert excinfo.value.status_code == 500
+        print(f"HTTPException detail: {excinfo.value.detail}")
+        mock_get_response.assert_called_once_with("Hello, AI!", ai="qa-chain")

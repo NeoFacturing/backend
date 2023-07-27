@@ -25,10 +25,27 @@ Every time
 To run this project, you will need to add the following environment variables to your .env file:
 
 `PROJECT_NAME`
+`AUTH_SECRET_KEY`
+`DECODING_ALGORITHM`
+`ACCESS_TOKEN_EXPIRE_MINUTES`
+`ENV`
+`AZURE_STORAGE_CONNECTION_STRING`
+`LANGCHAIN_PROJECT`
+`LANGCHAIN_TRACING_V2`
+`LANGCHAIN_ENDPOINT`
+`LANGCHAIN_API_KEY`
 `OPENAI_API_KEY`
-`PINECONE_API_KEY`
-`PINECONE_ENVIRONMENT`
-`PINECONE_INDEX_NAME`
+`OPENAI_API_BASE`
+`OPENAI_API_VERSION`
+
+## Testing
+
+Our git workflow assesses functions with pytest. Tests directory defines all tests by following the same structure in the app directory. Every time users merge branches, .github/workflows/ci.yml file detects errors in codes.
+To run the tests execute the following command:
+
+```bash
+    poetry run pytest
+```
 
 ## Docker
 
