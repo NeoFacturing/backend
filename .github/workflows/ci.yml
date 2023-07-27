@@ -54,6 +54,3 @@ jobs:
         run: |
           docker build -t $IMAGE_NAME:$TAG .
           docker push $IMAGE_NAME:$TAG
-      - name: Configure Azure App Service Webhook
-        run: |
-          az webapp deployment container config --enable-cd true -n neoFacturing-backend -g docker-rg --docker-custom-image-name $IMAGE_NAME:$TAG
