@@ -3,8 +3,7 @@ name: CI & Docker Build/Push
 on:
   push:
     branches:
-      - development
-      - main
+      - feature/7/langsmith-integration
 
 jobs:
   ci:
@@ -35,7 +34,7 @@ jobs:
   cd:
     runs-on: ubuntu-latest
 
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push'
 
     steps:
       - name: Checkout repository
