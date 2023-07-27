@@ -33,7 +33,7 @@ jobs:
 
   cd:
     runs-on: ubuntu-latest
-
+    needs: ci
     if: github.event_name == 'push'
 
     steps:
@@ -56,4 +56,4 @@ jobs:
           docker push $IMAGE_NAME:$TAG
       - name: Configure Azure App Service Webhook
         run: |
-          az webapp deployment container config -n neoFacturing-backend -g docker-rg --docker-registry-server-url https://neofacturing.azurecr.io --docker-custom-image-name neofacturing.azurecr.io/backend:latest
+          az webapp deployment container config --enable-cd true -n neoFacturing-backend -g docker-rg --docker-registry-server-url https://neofacturing.azurecr.io --docker-custom-image-name neofacturing.azurecr.io/backend:latest
