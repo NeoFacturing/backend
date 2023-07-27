@@ -1,8 +1,11 @@
+name: CI & Docker Build/Push
+
 on:
   push:
-    branches: [main, development]
-  pull_request:
-    branches: [main, development]
+    branches:
+      - development
+      - main
+
 jobs:
   ci:
     runs-on: ubuntu-latest
@@ -23,8 +26,35 @@ jobs:
       - name: Tests
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          SECRET_KEY: ${{ secrets.SECRET_KEY }}
-          ALGORITHM: ${{ secrets.ALGORITHM }}
+          AUTH_SECRET_KEY: ${{ secrets.AUTH_SECRET_KEY }}
+          DECODING_ALGORITHM: ${{ secrets.DECODING_ALGORITHM }}
           ACCESS_TOKEN_EXPIRE_MINUTES: ${{ secrets.ACCESS_TOKEN_EXPIRE_MINUTES }}
-          AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING}}
+          AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
         run: poetry run pytest
+
+  cd:
+    runs-on: ubuntu-latest
+
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Login to Azure Container Registry
+        uses: azure/docker-login@v1
+        with:
+          login-server: neofacturing.azurecr.io
+          username: ${{ secrets.AZURE_REGISTRY_USERNAME }}
+          password: ${{ secrets.AZURE_REGISTRY_PASSWORD }}
+
+      - name: Build and Push Docker Image
+        env:
+          IMAGE_NAME: neofacturing.azurecr.io/backend
+          TAG: latest
+        run: |
+          docker build -t $IMAGE_NAME:$TAG .
+          docker push $IMAGE_NAME:$TAG
+      - name: Configure Azure App Service Webhook
+        run: |
+          az webapp deployment container config -n neoFacturing-backend -g docker-rg --docker-registry-server-url https://neofacturing.azurecr.io --docker-custom-image-name neofacturing.azurecr.io/backend:latest

@@ -120,7 +120,7 @@ def get_current_user_from_token(
 
 
 @app.get("/")
-async def read_root(name: Optional[str] = "we are neoFacturing"):
+async def read_root(name: Optional[str] = "we are neoFacturing!"):
     return {"Hello": name}
 
 
