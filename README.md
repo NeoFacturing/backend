@@ -25,7 +25,6 @@ Every time
 To run this project, you will need to add the following environment variables to your .env file:
 
 `PROJECT_NAME`
-`OPENAI_API_KEY`
 `AUTH_SECRET_KEY`
 `DECODING_ALGORITHM`
 `ACCESS_TOKEN_EXPIRE_MINUTES`
@@ -35,6 +34,9 @@ To run this project, you will need to add the following environment variables to
 `LANGCHAIN_TRACING_V2`
 `LANGCHAIN_ENDPOINT`
 `LANGCHAIN_API_KEY`
+`OPENAI_API_KEY`
+`OPENAI_API_BASE`
+`OPENAI_API_VERSION`
 
 ## Testing
 
