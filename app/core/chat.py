@@ -1,5 +1,6 @@
 from app.core.azure_utils import generate_download_link, get_blob_service_client
 from app.core.llm_chain import simple_llm_chain
+from app.core.agent import open_ai_agent
 
 
 def get_response(input: str, ai: str, input_file: str) -> str:
@@ -31,6 +32,8 @@ def get_response(input: str, ai: str, input_file: str) -> str:
             "response": response,
             "files": [dl_link],
         }
+        response = open_ai_agent(sanitizedInput)
+        return response
     except Exception as e:
         print(f"Error in running the chain: {str(e)}")
         return None
