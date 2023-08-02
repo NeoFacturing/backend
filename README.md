@@ -37,6 +37,7 @@ To run this project, you will need to add the following environment variables to
 `OPENAI_API_KEY`
 `OPENAI_API_BASE`
 `OPENAI_API_VERSION`
+`NGROK_URL`
 
 ## Testing
 
