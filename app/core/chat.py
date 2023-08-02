@@ -1,4 +1,4 @@
-from app.core.llm_chain import simple_llm_chain
+from app.core.agent import open_ai_agent
 
 
 def get_response(input: str, ai: str) -> str:
@@ -19,7 +19,7 @@ def get_response(input: str, ai: str) -> str:
         print(f"Error in sanitizing the input: {str(e)}")
         return None
     try:
-        response = simple_llm_chain.run(input=sanitizedInput)
+        response = open_ai_agent(sanitizedInput)
         return response
     except Exception as e:
         print(f"Error in running the chain: {str(e)}")
