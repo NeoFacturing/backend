@@ -1,7 +1,8 @@
+from app.core.azure_utils import generate_download_link, get_blob_service_client
 from app.core.llm_chain import simple_llm_chain
 
 
-def get_response(input: str, ai: str) -> str:
+def get_response(input: str, ai: str, input_file: str) -> str:
     """
     Get a response from the AI model based on the user input.
 
@@ -20,7 +21,16 @@ def get_response(input: str, ai: str) -> str:
         return None
     try:
         response = simple_llm_chain.run(input=sanitizedInput)
-        return response
+
+        file_path = "ab2f11263d9297ab/out/screen.bmp"
+
+        blob_service_client = get_blob_service_client()
+        dl_link = generate_download_link(blob_service_client, file_path)
+
+        return {
+            "response": response,
+            "files": [dl_link],
+        }
     except Exception as e:
         print(f"Error in running the chain: {str(e)}")
         return None

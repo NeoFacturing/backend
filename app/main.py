@@ -1,5 +1,6 @@
 from typing import List, Optional
 import os
+import secrets
 from fastapi import (
     FastAPI,
     Depends,
@@ -9,7 +10,6 @@ from fastapi import (
     Response,
 )
 from fastapi.middleware.cors import CORSMiddleware
-from azure.storage.blob import BlobServiceClient
 
 from jose import jwt, JWTError
 from fastapi.security import OAuth2PasswordRequestForm
@@ -22,6 +22,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm
 from jose import jwt, JWTError
 from pydantic import BaseModel
+from azure.storage.blob import BlobServiceClient
+from app.core.azure_utils import get_blob_service_client
+
 
 from app.core.chat import get_response
 from app.database.config import settings
@@ -38,8 +41,8 @@ def get_application():
 
     _app.add_middleware(
         CORSMiddleware,
-        # allow_origins=["*"],
-        allow_origins=[str(origin) for origin in settings.BACKEND_CORS_ORIGINS],
+        allow_origins=["*"],
+        # allow_origins=[str(origin) for origin in settings.BACKEND_CORS_ORIGINS],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
@@ -136,7 +139,9 @@ async def read_users_me(current_user: User = Depends(get_current_user_from_token
 )
 async def read_chat(request: ChatRequest):
     try:
-        response = get_response(request.messages[-1].content, ai="qa-chain")
+        response = get_response(
+            request.messages[-1].content, ai="qa-chain", input_file=request.files[0]
+        )
         if response is not None:
             return response
         else:
@@ -152,16 +157,25 @@ async def create_upload_file(
     # current_user: User = Depends(get_current_user_from_token),
     file: UploadFile = File(...),
 ):
-    try:
-        blob_service_client = BlobServiceClient.from_connection_string(
-            os.getenv("AZURE_STORAGE_CONNECTION_STRING")
+    if not (file.filename.lower().endswith((".step", ".stp"))):
+        raise HTTPException(
+            status_code=500, detail="Wrong file type. You need a STEP file"
         )
-        blob_client = blob_service_client.get_blob_client("uploads", file.filename)
+    try:
+        folder_name = secrets.token_hex(8)  # returns 16 character random string
 
+        full_path = f"{folder_name}/input.step"
+
+        blob_service_client = get_blob_service_client()
+        blob_client = blob_service_client.get_blob_client(
+            "uploads", f"{folder_name}/input.step"
+        )
         data = await file.read()
         blob_client.upload_blob(data, overwrite=True)
-        print(f"File {file.filename} uploaded successfully")
-        return {"filename": file.filename}
+
+        print(f"File uploaded successfully to {full_path}")
+
+        return {"filename": full_path}
     except Exception as e:
         print("Error uploading file")
         print(e)
