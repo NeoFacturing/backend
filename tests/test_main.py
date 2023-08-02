@@ -57,7 +57,9 @@ def test_read_chat():
     ) as mock_get_response:
         response = asyncio.run(read_chat(mock_request))
         assert response == "Hello, user!"
-        mock_get_response.assert_called_once_with("Hello, AI!", ai="qa-chain")
+        mock_get_response.assert_called_once_with(
+            "Hello, AI!", ai="qa-chain", input_file="test.step"
+        )
 
     # Mock the get_response function to raise an Exception
     with patch("app.main.get_response", side_effect=Exception()) as mock_get_response:
@@ -65,4 +67,6 @@ def test_read_chat():
             asyncio.run(read_chat(mock_request))
         assert excinfo.value.status_code == 500
         print(f"HTTPException detail: {excinfo.value.detail}")
-        mock_get_response.assert_called_once_with("Hello, AI!", ai="qa-chain")
+        mock_get_response.assert_called_once_with(
+            "Hello, AI!", ai="qa-chain", input_file="test.step"
+        )
