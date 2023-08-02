@@ -21,7 +21,7 @@ def get_response(input: str, ai: str, input_file: str) -> str:
         print(f"Error in sanitizing the input: {str(e)}")
         return None
     try:
-        response = simple_llm_chain.run(input=sanitizedInput)
+        response = open_ai_agent(sanitizedInput)
 
         file_path = "ab2f11263d9297ab/out/screen.bmp"
 
@@ -32,8 +32,7 @@ def get_response(input: str, ai: str, input_file: str) -> str:
             "response": response,
             "files": [dl_link],
         }
-        response = open_ai_agent(sanitizedInput)
-        return response
+
     except Exception as e:
         print(f"Error in running the chain: {str(e)}")
         return None
