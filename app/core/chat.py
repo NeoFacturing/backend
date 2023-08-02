@@ -1,5 +1,4 @@
 from app.core.azure_utils import generate_download_link, get_blob_service_client
-from app.core.llm_chain import simple_llm_chain
 from app.core.agent import open_ai_agent
 
 
@@ -21,15 +20,15 @@ def get_response(input: str, ai: str, input_file: str) -> str:
         print(f"Error in sanitizing the input: {str(e)}")
         return None
     try:
-        response = open_ai_agent(sanitizedInput)
-
-        file_path = "ab2f11263d9297ab/out/screen.bmp"
-
+        folder_name = input_file.split("/")[0]
+        input_file_path = folder_name + "/input.step"
+        output_file_path = folder_name + "/out/screen.bmp"
         blob_service_client = get_blob_service_client()
-        dl_link = generate_download_link(blob_service_client, file_path)
-
+        sanitizedInput = sanitizedInput + "Dateipfad: " + input_file_path
+        response = open_ai_agent(sanitizedInput)
+        dl_link = generate_download_link(blob_service_client, output_file_path)
         return {
-            "response": response,
+            "response": response["output"],
             "files": [dl_link],
         }
 
