@@ -1,31 +1,18 @@
-from typing import List, Optional
 import os
 import secrets
-from fastapi import (
-    FastAPI,
-    Depends,
-    File,
-    HTTPException,
-    status,
-    Response,
-)
-from fastapi.middleware.cors import CORSMiddleware
-
-from jose import jwt, JWTError
-from fastapi.security import OAuth2PasswordRequestForm
 from datetime import timedelta
 import os
 from typing import List, Optional, Annotated
 
-from fastapi import FastAPI, Depends, HTTPException, Query, status, Response, UploadFile
+from fastapi import FastAPI, Depends, HTTPException, File, status, Response, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm
 from jose import jwt, JWTError
+import langchain
 from pydantic import BaseModel
 from azure.storage.blob import BlobServiceClient
+
 from app.core.azure_utils import get_blob_service_client
-
-
 from app.core.chat import get_response
 from app.database.config import settings
 from app.database.database import Session
@@ -61,6 +48,8 @@ def get_db():
     finally:
         db.close()
 
+if os.environ.get("ENV") == "local":
+    langchain.debug = True
 
 def authenticate_user(username: str, password: str, db: Session):
     print(username)
@@ -139,17 +128,21 @@ async def read_users_me(current_user: User = Depends(get_current_user_from_token
 )
 async def read_chat(request: ChatRequest):
     try:
-        response = get_response(
-            request.messages[-1].content, ai="qa-chain", input_file=request.files[0]
-        )
+        content = request.messages[-1].content
+        input_file = request.files[0] if request.files else None
+        
+        response = get_response(content, ai="qa-chain", input_file=input_file)
+        
         if response is not None:
             return response
         else:
             raise HTTPException(
                 status_code=500, detail="Failed to get a response from the AI model"
             )
+    except IndexError:
+        raise HTTPException(status_code=400, detail="No messages provided in the request")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=f"An unexpected error occurred: {str(e)}")
 
 
 @app.post("/uploadfile")
