@@ -50,7 +50,7 @@ def take_screenshot(filepath: str) -> str:
     """Schicke eine Anfrage an den Server mit dem Pfad zur .step Datei, um einen Screenshot zu erstellen."""
     print(filepath)
     params = {"filepath": filepath}
-    url = os.environ["NGROK_URL"] + "/api/SolidWorks/screenShots"
+    url = os.environ["NGROK_URL"] + "/api/SolidWorks/screenshots"
     response = requests.get(url, params=params)
 
     if response.status_code == 200:
@@ -85,4 +85,4 @@ class ScreenshotTool(BaseTool):
     args_schema: Optional[Type[BaseModel]] = ScreenshotInput
 
 
-tools = [DraftAnalysisTool()]
+tools = [DraftAnalysisTool(), ScreenshotTool()]
