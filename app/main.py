@@ -1,28 +1,18 @@
-from typing import List, Optional
 import os
-from fastapi import (
-    FastAPI,
-    Depends,
-    File,
-    HTTPException,
-    status,
-    Response,
-)
-from fastapi.middleware.cors import CORSMiddleware
-from azure.storage.blob import BlobServiceClient
-
-from jose import jwt, JWTError
-from fastapi.security import OAuth2PasswordRequestForm
+import secrets
 from datetime import timedelta
 import os
 from typing import List, Optional, Annotated
 
-from fastapi import FastAPI, Depends, HTTPException, Query, status, Response, UploadFile
+from fastapi import FastAPI, Depends, HTTPException, File, status, Response, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm
 from jose import jwt, JWTError
+import langchain
 from pydantic import BaseModel
+from azure.storage.blob import BlobServiceClient
 
+from app.core.azure_utils import get_blob_service_client
 from app.core.chat import get_response
 from app.database.config import settings
 from app.database.database import Session
@@ -38,8 +28,8 @@ def get_application():
 
     _app.add_middleware(
         CORSMiddleware,
-        # allow_origins=["*"],
-        allow_origins=[str(origin) for origin in settings.BACKEND_CORS_ORIGINS],
+        allow_origins=["*"],
+        # allow_origins=[str(origin) for origin in settings.BACKEND_CORS_ORIGINS],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
@@ -57,6 +47,10 @@ def get_db():
         yield db
     finally:
         db.close()
+
+
+if os.environ.get("ENV") == "local":
+    langchain.debug = True
 
 
 def authenticate_user(username: str, password: str, db: Session):
@@ -136,15 +130,25 @@ async def read_users_me(current_user: User = Depends(get_current_user_from_token
 )
 async def read_chat(request: ChatRequest):
     try:
-        response = get_response(request.messages[-1].content, ai="qa-chain")
+        content = request.messages[-1].content
+        input_file = request.files[0] if request.files else None
+
+        response = get_response(content, ai="qa-chain", input_file=input_file)
+
         if response is not None:
             return response
         else:
             raise HTTPException(
                 status_code=500, detail="Failed to get a response from the AI model"
             )
+    except IndexError:
+        raise HTTPException(
+            status_code=400, detail="No messages provided in the request"
+        )
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(
+            status_code=500, detail=f"An unexpected error occurred: {str(e)}"
+        )
 
 
 @app.post("/uploadfile")
@@ -152,16 +156,25 @@ async def create_upload_file(
     # current_user: User = Depends(get_current_user_from_token),
     file: UploadFile = File(...),
 ):
-    try:
-        blob_service_client = BlobServiceClient.from_connection_string(
-            os.getenv("AZURE_STORAGE_CONNECTION_STRING")
+    if not (file.filename.lower().endswith((".step", ".stp"))):
+        raise HTTPException(
+            status_code=500, detail="Wrong file type. You need a STEP file"
         )
-        blob_client = blob_service_client.get_blob_client("uploads", file.filename)
+    try:
+        folder_name = secrets.token_hex(8)  # returns 16 character random string
 
+        full_path = f"{folder_name}/input.step"
+
+        blob_service_client = get_blob_service_client()
+        blob_client = blob_service_client.get_blob_client(
+            "uploads", f"{folder_name}/input.step"
+        )
         data = await file.read()
         blob_client.upload_blob(data, overwrite=True)
-        print(f"File {file.filename} uploaded successfully")
-        return {"filename": file.filename}
+
+        print(f"File uploaded successfully to {full_path}")
+
+        return {"filename": full_path}
     except Exception as e:
         print("Error uploading file")
         print(e)
