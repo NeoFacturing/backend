@@ -9,7 +9,7 @@ python = "^3.9"
 fastapi = "^0.100"
 pydantic = {extras = ["dotenv"], version = "^1.10.7"}
 uvicorn = "^0.22.0"
-langchain = "^0.0.235"
+langchain = "0.0.249"
 openai = "^0.27.6"
 pinecone-client = "^2.2.1"
 pdfplumber = "^0.9.0"
