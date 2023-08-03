@@ -22,14 +22,35 @@ def get_response(input: str, ai: str, input_file: str) -> str:
     try:
         folder_name = input_file.split("/")[0]
         input_file_path = folder_name + "/input.step"
-        output_file_path = folder_name + "/out/screen.bmp"
+
+        output_files = [
+            "backView.bmp",
+            "bottomView.bmp",
+            "dimetricView.bmp",
+            "frontView.bmp",
+            "isometricView.bmp",
+            "leftView.bmp",
+            "rightView.bmp",
+            "topView.bmp",
+            "trimetricView.bmp",
+        ]
+        blob_service_client = get_blob_service_client()
+        dl_links = list(
+            map(
+                lambda file_name: generate_download_link(
+                    blob_service_client, folder_name + "/out/" + file_name
+                ),
+                output_files,
+            )
+        )
+
         blob_service_client = get_blob_service_client()
         sanitizedInput = sanitizedInput + "Dateipfad: " + input_file_path
         response = open_ai_agent(sanitizedInput)
-        dl_link = generate_download_link(blob_service_client, output_file_path)
+
         return {
             "response": response["output"],
-            "files": [dl_link],
+            "files": dl_links,
         }
 
     except Exception as e:
