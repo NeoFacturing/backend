@@ -9,7 +9,6 @@ from langchain.tools import BaseTool
 
 def draft_analysis(filepath: str) -> str:
     """Schickt eine Anfrage an den Server mit dem Pfad zur .step Datei, um eine Formschrägenanalyse durchzuführen."""
-    print(filepath)
     params = {"filepath": filepath}
     url = os.environ["NGROK_URL"] + "/api/SolidWorks/draftAnalysis"
     response = requests.get(url, params=params)
@@ -48,14 +47,13 @@ class DraftAnalysisTool(BaseTool):
 
 def take_screenshot(filepath: str) -> str:
     """Schicke eine Anfrage an den Server mit dem Pfad zur .step Datei, um einen Screenshot zu erstellen."""
-    print(filepath)
     params = {"filepath": filepath}
     url = os.environ["NGROK_URL"] + "/api/SolidWorks/screenshots"
     response = requests.get(url, params=params)
 
     if response.status_code == 200:
         print("Screenshot request was successful!")
-        return "Screenshot was successfully taken!"
+        return "Screenshotanfrage war erfolgreich!"
     else:
         print(f"Failed to send screenshot request! Status code: {response.status_code}")
         return f"Failed to send screenshot request! Status code: {response.status_code}"
@@ -73,10 +71,10 @@ class ScreenshotInput(BaseModel):
 
 class ScreenshotTool(BaseTool):
     name = "screenshot_tool"
-    description = "Erstellt Screenshots für .step Dateien."
+    description = "Screenshots für .step Dateien."
 
     def _run(self, filepath: ScreenshotInput) -> str:
-        sanitizedInput = filepath.filepath.strip().replace("\n", " ")
+        sanitizedInput = filepath.strip().replace("\n", " ")
         return take_screenshot(filepath=sanitizedInput)
 
     def _arun(self, input: ScreenshotInput) -> str:
