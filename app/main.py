@@ -48,8 +48,10 @@ def get_db():
     finally:
         db.close()
 
+
 if os.environ.get("ENV") == "local":
     langchain.debug = True
+
 
 def authenticate_user(username: str, password: str, db: Session):
     print(username)
@@ -130,9 +132,9 @@ async def read_chat(request: ChatRequest):
     try:
         content = request.messages[-1].content
         input_file = request.files[0] if request.files else None
-        
+
         response = get_response(content, ai="qa-chain", input_file=input_file)
-        
+
         if response is not None:
             return response
         else:
@@ -140,9 +142,13 @@ async def read_chat(request: ChatRequest):
                 status_code=500, detail="Failed to get a response from the AI model"
             )
     except IndexError:
-        raise HTTPException(status_code=400, detail="No messages provided in the request")
+        raise HTTPException(
+            status_code=400, detail="No messages provided in the request"
+        )
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"An unexpected error occurred: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"An unexpected error occurred: {str(e)}"
+        )
 
 
 @app.post("/uploadfile")
